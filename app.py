@@ -1,4 +1,4 @@
-# server.py
+# app.py
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from xss_route import handle_xss_routes
 
