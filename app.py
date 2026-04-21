@@ -1,6 +1,6 @@
-# server.py
+# app.py
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from xss_vulnerable_routes import handle_xss_routes
+from xss_route import handle_xss_routes
 
 class Handler(BaseHTTPRequestHandler):
 
