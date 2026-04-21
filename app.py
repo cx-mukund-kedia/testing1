@@ -1,8 +1,13 @@
+# server.py
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from xss_vulnerable_routes import handle_xss_routes
 
 class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+        if handle_xss_routes(self):
+            return
+
         if self.path == "/" or self.path == "/index.html":
             html = """
             <!DOCTYPE html>
@@ -17,12 +22,24 @@ class Handler(BaseHTTPRequestHandler):
                     p    { color: #666; line-height: 1.6; }
                     a    { color: #0070f3; text-decoration: none; }
                     a:hover { text-decoration: underline; }
+                    ul   { padding-left: 20px; }
+                    li   { margin: 6px 0; }
                 </style>
             </head>
             <body>
                 <h1>Welcome home 👋</h1>
                 <p>This is a simple Python HTTP server with no external dependencies.</p>
                 <p><a href="/about">About</a></p>
+                <hr>
+                <h2>XSS Demo Routes</h2>
+                <ul>
+                    <li><a href='/xss/search?q=hello'>Reflected XSS — search</a></li>
+                    <li><a href='/xss/profile?user=alice'>Attribute breakout — profile</a></li>
+                    <li><a href='/xss/comment'>Stored XSS — comments</a></li>
+                    <li><a href='/xss/redirect?to=/'>Open redirect + javascript: URI</a></li>
+                    <li><a href='/xss/template?name=stranger&subject=security'>Template injection</a></li>
+                    <li><a href='/xss/json?callback=handleData'>JSONP-style script injection</a></li>
+                </ul>
             </body>
             </html>
             """
@@ -61,7 +78,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(encoded)
 
     def log_message(self, format, *args):
-        print(f"{args[1]} {args[0]}")   # e.g.  200 GET /
+        print(f"{args[1]} {args[0]}")
 
 
 if __name__ == "__main__":
